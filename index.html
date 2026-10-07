@@ -3,82 +3,185 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Image-to-3D Studio</title>
+    <meta name="theme-color" content="#101116" />
+    <meta name="description" content="Meet Elio, your expressive, voice-enabled robot companion." />
+    <title>Elio — your little companion</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="app">
-      <div class="topbar">
-        <div class="brand">
-          <span class="brand-mark"></span>
-          <span>Image-to-3D Studio</span>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Elio home">
+          <span class="brand-orb" aria-hidden="true"><span></span></span>
+          <span>elio<span class="brand-period">.</span></span>
+        </a>
+        <div class="header-center"><span class="live-dot"></span> YOUR COMPANION, IN YOUR CORNER</div>
+        <div class="header-right">
+          <span class="private-badge"><span aria-hidden="true">◈</span> PRIVATE BY DESIGN</span>
+          <span class="creator-chip"><span class="creator-spark" aria-hidden="true">✳</span> BUILT BY YOU</span>
         </div>
-        <div class="header-badges">
-          <span class="badge">Depth map</span>
-          <span class="badge">GLB / OBJ / FBX</span>
-        </div>
-      </div>
+      </header>
 
-      <div class="layout">
-        <aside class="sidebar">
-          <div class="card">
-            <h3>Upload image</h3>
-            <div class="upload-area">
-              <input id="imageUpload" type="file" accept="image/*" />
-              <div class="upload-copy">
-                <strong>Choose a photo</strong>
-                JPG, PNG, or WEBP
+      <section class="welcome-row" aria-label="Welcome">
+        <div>
+          <p class="eyebrow">YOUR SPACE · YOUR LITTLE ROBOT</p>
+          <h1>A little more <span>alive.</span></h1>
+        </div>
+        <p class="welcome-copy">A curious companion with a growing memory.<br />Always happy to see you, <span id="welcomeTitle">Architect</span>.</p>
+      </section>
+
+      <div class="workspace">
+        <section class="companion-card panel" aria-labelledby="companionHeading">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">COMPANION UNIT 01</p>
+              <h2 id="companionHeading">Elio <span class="heading-subtitle">/ your little robot</span></h2>
+            </div>
+            <span class="mood-pill"><span class="mood-dot"></span><span id="moodLabel">CURIOUS</span></span>
+          </div>
+
+          <div class="robot-scene" id="robotScene" data-expression="curious" aria-label="Elio's animated robot face">
+            <div class="scene-glow"></div>
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <span class="float-star star-one" aria-hidden="true">✳</span>
+            <span class="float-star star-two" aria-hidden="true">✧</span>
+            <span class="float-star star-three" aria-hidden="true">·</span>
+            <div class="robot">
+              <div class="antenna"><span></span></div>
+              <div class="ear ear-left"><span></span></div>
+              <div class="ear ear-right"><span></span></div>
+              <div class="head-shell">
+                <div class="head-shine"></div>
+                <div class="face-screen">
+                  <span class="brow brow-left"></span>
+                  <span class="brow brow-right"></span>
+                  <div class="eyes">
+                    <div class="eye eye-left"><span class="pupil"><i></i></span></div>
+                    <div class="eye eye-right"><span class="pupil"><i></i></span></div>
+                  </div>
+                  <span class="cheek cheek-left"></span>
+                  <span class="cheek cheek-right"></span>
+                  <svg class="mouth" viewBox="0 0 80 42" aria-hidden="true">
+                    <path class="mouth-happy" d="M17 13 Q40 41 63 13" />
+                    <path class="mouth-curious" d="M25 24 Q40 15 55 24" />
+                    <path class="mouth-sad" d="M19 30 Q40 8 61 30" />
+                    <path class="mouth-surprised" d="M31 13 Q40 7 49 13 Q55 29 40 33 Q25 29 31 13Z" />
+                    <path class="mouth-speaking" d="M31 18 Q40 14 49 18 Q53 29 40 33 Q27 29 31 18Z" />
+                    <path class="mouth-annoyed" d="M25 25 Q40 20 55 25" />
+                    <path class="mouth-love" d="M17 15 Q40 41 63 15" />
+                    <path class="mouth-sleepy" d="M26 24 Q40 22 54 24" />
+                  </svg>
+                  <span class="heart-eye heart-eye-left" aria-hidden="true">♥</span>
+                  <span class="heart-eye heart-eye-right" aria-hidden="true">♥</span>
+                  <span class="zzz" aria-hidden="true">z<span>z</span></span>
+                  <span class="annoyed-mark" aria-hidden="true">!</span>
+                </div>
+              </div>
+              <div class="neck"></div>
+              <div class="body-shell">
+                <div class="body-lights"><i></i><i></i><i></i></div>
+                <span class="body-mark">e</span>
               </div>
             </div>
-            <div id="fileName" class="file-meta">No file selected</div>
+            <div class="camera-preview" id="cameraPreview">
+              <video id="cameraVideo" autoplay muted playsinline aria-label="Live camera preview"></video>
+              <span class="camera-live"><span class="live-dot"></span> LIVE</span>
+              <span class="camera-placeholder" id="cameraPlaceholder"><span>⌕</span><br />Your camera view appears here</span>
+            </div>
+            <div class="scene-caption"><span class="caption-spark">✳</span><span id="sceneCaption">Hmm. Something tells me today is going to be interesting.</span></div>
           </div>
 
-          <div class="card">
-            <h3>Mesh settings</h3>
-            <div class="control-group">
-              <label for="depthStrength">Depth strength</label>
-              <input id="depthStrength" type="range" min="0.5" max="3.5" step="0.1" value="1.8" />
-              <div class="range-label">
-                <span>Low</span>
-                <span id="depthValue">1.8x</span>
-                <span>High</span>
+          <div class="companion-controls" aria-label="Companion controls">
+            <button class="control-button" id="cameraButton" type="button" aria-pressed="false">
+              <span class="control-icon" aria-hidden="true">◉</span><span id="cameraButtonLabel">Turn camera on</span>
+            </button>
+            <button class="control-button" id="voiceButton" type="button" aria-pressed="false">
+              <span class="control-icon mic-icon" aria-hidden="true">♩</span><span id="voiceButtonLabel">Talk to Elio</span>
+            </button>
+            <button class="control-button sound-button" id="soundButton" type="button" aria-pressed="true" aria-label="Mute Elio's voice">
+              <span class="control-icon" id="soundIcon" aria-hidden="true">♫</span>
+            </button>
+          </div>
+
+          <div class="memory-strip">
+            <div class="memory-icon" aria-hidden="true">✳</div>
+            <div class="memory-copy"><strong id="memoryHeading">Getting to know you</strong><span id="memorySummary">Elio remembers the little things you choose to share.</span></div>
+            <button class="memory-count" id="openMemoriesButton" type="button" aria-haspopup="dialog" aria-label="Open saved memories"><span id="memoryCount">0</span><span>memories</span></button>
+          </div>
+        </section>
+
+        <section class="chat-card panel" aria-labelledby="chatHeading">
+          <div class="chat-heading">
+            <div class="chat-avatar" aria-hidden="true"><span class="avatar-eye"></span><span class="avatar-eye"></span><span class="avatar-mouth"></span></div>
+            <div class="chat-title"><h2 id="chatHeading">A moment with Elio</h2><p><span class="live-dot"></span> Right here with you</p></div>
+            <button class="icon-button" id="clearChatButton" type="button" title="Clear this conversation" aria-label="Clear this conversation">↺</button>
+          </div>
+
+          <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions text">
+            <div class="message-row elio-row">
+              <div class="message-avatar" aria-hidden="true">e</div>
+              <div class="message-content">
+                <span class="message-author">ELIO <span>JUST NOW</span></span>
+                <div class="message-bubble">Oh! You're here, Architect. I'm Elio — your very own little robot. I've been wondering what the world is like from your side. <span class="bubble-spark" aria-hidden="true">✳</span><br /><br />Tell me about yourself, or just say hello. I'll remember the things you ask me to.</div>
               </div>
             </div>
           </div>
 
-          <div class="card">
-            <h3>Generate model</h3>
-            <button id="generateBtn" class="primary-btn">Generate 3D mesh</button>
-            <button id="clearBtn" class="secondary-btn" style="margin-top: 10px;">Clear</button>
+          <div class="suggestions" aria-label="Try asking Elio">
+            <button class="suggestion" type="button" data-prompt="How are you feeling today?">How are you feeling?</button>
+            <button class="suggestion" type="button" data-prompt="What do you remember about me?">What do you remember?</button>
+            <button class="suggestion" type="button" data-prompt="Tell me a little joke">Tell me a joke</button>
           </div>
 
-          <div class="card">
-            <h3>Download</h3>
-            <div class="download-grid">
-              <button class="download-btn" data-format="glb" disabled>GLB</button>
-              <button class="download-btn" data-format="obj" disabled>OBJ</button>
-              <button class="download-btn" data-format="fbx" disabled>FBX</button>
-            </div>
-          </div>
-        </aside>
-
-        <main class="viewer-panel">
-          <div class="viewer-box">
-            <canvas id="viewer"></canvas>
-          </div>
-
-          <div class="preview-strip">
-            <img id="previewImage" class="preview-thumb hidden" alt="Uploaded preview" />
-            <div id="status" class="status">Upload a photo to generate a 3D surface mesh.</div>
-          </div>
-        </main>
+          <form class="composer" id="chatForm">
+            <label class="sr-only" for="messageInput">Message Elio</label>
+            <input id="messageInput" type="text" maxlength="500" placeholder="Say something to Elio..." autocomplete="off" />
+            <button class="send-button" type="submit" aria-label="Send message"><span aria-hidden="true">↑</span></button>
+          </form>
+          <p class="privacy-note"><span aria-hidden="true">◈</span> Your memories stay on this device. Camera and microphone are opt-in.</p>
+        </section>
       </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.164.1/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.164.1/examples/js/exporters/GLTFExporter.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.164.1/examples/js/exporters/OBJExporter.js"></script>
-    <script src="app.js"></script>
+      <footer class="footer"><span>ELIO <span class="brand-period">✳</span> A LITTLE ROBOT WITH A LOT OF HEART</span><button class="reset-button" id="settingsButton" type="button" aria-haspopup="dialog">Settings &amp; memory</button><span>LOCAL COMPANION PROTOTYPE</span></footer>
+    </main>
+    <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsHeading">
+      <form method="dialog" class="settings-panel">
+        <div class="settings-heading">
+          <div>
+            <p class="eyebrow">ELIO · PERSONAL SPACE</p>
+            <h2 id="settingsHeading">A few ground rules</h2>
+          </div>
+          <button class="icon-button" id="closeSettingsButton" type="button" aria-label="Close settings">×</button>
+        </div>
+        <fieldset class="settings-section title-options">
+          <legend>What should I call you?</legend>
+          <label><input type="checkbox" name="title" value="Architect" /> Architect</label>
+          <label><input type="checkbox" name="title" value="Captain" /> Captain</label>
+          <label><input type="checkbox" name="title" value="Boss" /> Boss</label>
+          <label><input type="checkbox" name="title" value="Sir" /> Sir</label>
+          <label><input type="checkbox" name="title" value="Architect of the System" /> Architect of the System</label>
+        </fieldset>
+        <div class="settings-toggles settings-section">
+          <label><input id="memoryEnabled" type="checkbox" /> <span><strong>Long-term memory</strong><small>Save preferences and notes on this device.</small></span></label>
+          <label><input id="autonomyEnabled" type="checkbox" /> <span><strong>Occasional check-ins</strong><small>Elio may start a quiet conversation when you’re around.</small></span></label>
+        </div>
+        <section class="settings-section memory-manager" aria-labelledby="savedMemoriesHeading">
+          <div class="memory-manager-heading"><h3 id="savedMemoriesHeading">Saved memories</h3><button class="text-button" id="forgetAllButton" type="button">Forget all</button></div>
+          <ul id="memoryList" class="memory-list"></ul>
+          <p class="memory-empty" id="memoryEmpty">Nothing saved yet. Say “remember that…” to keep a little detail.</p>
+        </section>
+        <p class="settings-footnote">This local prototype does not send memories or camera frames to an AI service. Browser speech recognition may use your browser’s own service.</p>
+      </form>
+    </dialog>
+    <script src="settings.js"></script>
+    <script src="memory.js"></script>
+    <script src="personality.js"></script>
+    <script src="brain.js"></script>
+    <script src="expressions.js"></script>
+    <script src="permissions.js"></script>
+    <script src="voice.js"></script>
+    <script src="vision.js"></script>
+    <script src="behavior.js"></script>
+    <script src="elio.js"></script>
   </body>
 </html>
