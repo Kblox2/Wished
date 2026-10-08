@@ -1,187 +1,203 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#101116" />
-    <meta name="description" content="Meet Elio, your expressive, voice-enabled robot companion." />
-    <title>Elio — your little companion</title>
+    <meta name="description" content="Turn a single image into a lightweight, animation-ready 3D model." />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self' ws://127.0.0.1:5173;" />
+    <title>Forma — Image to 3D</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="app-shell">
       <header class="topbar">
-        <a class="brand" href="#" aria-label="Elio home">
-          <span class="brand-orb" aria-hidden="true"><span></span></span>
-          <span>elio<span class="brand-period">.</span></span>
+        <a class="brand" href="#" aria-label="Forma home">
+          <span class="brand-mark" aria-hidden="true"><span></span></span>
+          <span class="brand-name">forma<span class="brand-period">.</span></span>
         </a>
-        <div class="header-center"><span class="live-dot"></span> YOUR COMPANION, IN YOUR CORNER</div>
-        <div class="header-right">
-          <span class="private-badge"><span aria-hidden="true">◈</span> PRIVATE BY DESIGN</span>
-          <span class="creator-chip"><span class="creator-spark" aria-hidden="true">✳</span> BUILT BY YOU</span>
+        <div class="topbar-center"><span class="status-dot"></span><span>IMAGE-TO-3D WORKSPACE</span></div>
+        <div class="topbar-right">
+          <button class="assistant-trigger" id="assistantButton" type="button">Ask AI <span aria-hidden="true">✳</span></button>
+          <span class="privacy-tag"><span aria-hidden="true">◇</span> KEY STAYS LOCAL</span>
+          <div class="window-controls" aria-label="Window controls">
+            <button class="window-control" type="button" data-window-action="minimize" aria-label="Minimize window" title="Minimize window">−</button>
+            <button class="window-control" type="button" data-window-action="maximize" aria-label="Maximize or restore" title="Maximize or restore">□</button>
+            <button class="window-control close-control" type="button" data-window-action="close" aria-label="Close application" title="Close application">×</button>
+          </div>
         </div>
       </header>
 
-      <section class="welcome-row" aria-label="Welcome">
-        <div>
-          <p class="eyebrow">YOUR SPACE · YOUR LITTLE ROBOT</p>
-          <h1>A little more <span>alive.</span></h1>
-        </div>
-        <p class="welcome-copy">A curious companion with a growing memory.<br />Always happy to see you, <span id="welcomeTitle">Architect</span>.</p>
-      </section>
-
       <div class="workspace">
-        <section class="companion-card panel" aria-labelledby="companionHeading">
-          <div class="card-heading">
+        <aside class="sidebar">
+          <div class="sidebar-heading">
             <div>
-              <p class="eyebrow">COMPANION UNIT 01</p>
-              <h2 id="companionHeading">Elio <span class="heading-subtitle">/ your little robot</span></h2>
+              <p class="eyebrow">CREATE A MODEL</p>
+              <h1>Image to <span>3D</span></h1>
             </div>
-            <span class="mood-pill"><span class="mood-dot"></span><span id="moodLabel">CURIOUS</span></span>
+            <span class="step-badge">01 <i>/ 02</i></span>
           </div>
+          <p class="intro-copy">Give a single image another dimension. Clean backgrounds and a clear view make the best starting point.</p>
 
-          <div class="robot-scene" id="robotScene" data-expression="curious" aria-label="Elio's animated robot face">
-            <div class="scene-glow"></div>
-            <div class="orbit orbit-one"></div>
-            <div class="orbit orbit-two"></div>
-            <span class="float-star star-one" aria-hidden="true">✳</span>
-            <span class="float-star star-two" aria-hidden="true">✧</span>
-            <span class="float-star star-three" aria-hidden="true">·</span>
-            <div class="robot">
-              <div class="antenna"><span></span></div>
-              <div class="ear ear-left"><span></span></div>
-              <div class="ear ear-right"><span></span></div>
-              <div class="head-shell">
-                <div class="head-shine"></div>
-                <div class="face-screen">
-                  <span class="brow brow-left"></span>
-                  <span class="brow brow-right"></span>
-                  <div class="eyes">
-                    <div class="eye eye-left"><span class="pupil"><i></i></span></div>
-                    <div class="eye eye-right"><span class="pupil"><i></i></span></div>
-                  </div>
-                  <span class="cheek cheek-left"></span>
-                  <span class="cheek cheek-right"></span>
-                  <svg class="mouth" viewBox="0 0 80 42" aria-hidden="true">
-                    <path class="mouth-happy" d="M17 13 Q40 41 63 13" />
-                    <path class="mouth-curious" d="M25 24 Q40 15 55 24" />
-                    <path class="mouth-sad" d="M19 30 Q40 8 61 30" />
-                    <path class="mouth-surprised" d="M31 13 Q40 7 49 13 Q55 29 40 33 Q25 29 31 13Z" />
-                    <path class="mouth-speaking" d="M31 18 Q40 14 49 18 Q53 29 40 33 Q27 29 31 18Z" />
-                    <path class="mouth-annoyed" d="M25 25 Q40 20 55 25" />
-                    <path class="mouth-love" d="M17 15 Q40 41 63 15" />
-                    <path class="mouth-sleepy" d="M26 24 Q40 22 54 24" />
-                  </svg>
-                  <span class="heart-eye heart-eye-left" aria-hidden="true">♥</span>
-                  <span class="heart-eye heart-eye-right" aria-hidden="true">♥</span>
-                  <span class="zzz" aria-hidden="true">z<span>z</span></span>
-                  <span class="annoyed-mark" aria-hidden="true">!</span>
-                </div>
+          <section class="setup-section" aria-labelledby="sourceHeading">
+            <div class="section-title"><span class="step-number">01</span><h2 id="sourceHeading">Source image</h2></div>
+            <label class="dropzone" id="dropzone" for="imageInput" tabindex="0">
+              <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+              <span class="upload-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <strong id="uploadTitle">Drop an image here</strong>
+              <span class="upload-subtitle" id="uploadSubtitle">or <span>browse files</span></span>
+              <span class="file-types">PNG, JPG OR WEBP <i>·</i> MAX 10 MB</span>
+            </label>
+            <div class="source-preview" id="sourcePreview" hidden>
+              <img id="sourceImage" alt="Selected source image" />
+              <div class="source-info"><span class="source-name" id="sourceName"></span><span id="sourceSize"></span></div>
+              <button class="remove-image" id="removeImage" type="button" aria-label="Remove selected image">×</button>
+            </div>
+          </section>
+
+          <section class="setup-section settings-section" aria-labelledby="settingsHeading">
+            <div class="section-title"><span class="step-number">02</span><h2 id="settingsHeading">Model settings</h2></div>
+            <span class="field-label">What are we making?</span>
+            <div class="segmented-control" role="group" aria-label="Model type">
+              <button class="segment active" type="button" data-model-type="character" aria-pressed="true">Character</button>
+              <button class="segment" type="button" data-model-type="object" aria-pressed="false">Object</button>
+            </div>
+            <div class="field-row">
+              <label class="field-control" for="detailSelect">
+                <span class="field-label">Mesh detail</span>
+                <select id="detailSelect">
+                  <option value="10000">Balanced · 10k</option>
+                  <option value="5000">Lightweight · 5k</option>
+                  <option value="15000">Detailed · 15k</option>
+                </select>
+              </label>
+              <label class="field-control" for="textureSelect">
+                <span class="field-label">Texture</span>
+                <select id="textureSelect">
+                  <option value="2k">Standard · 2K</option>
+                </select>
+              </label>
+            </div>
+            <p class="size-hint"><span class="hint-icon" aria-hidden="true">↘</span><span>Optimized for a <strong>maximum 9 MB export.</strong></span></p>
+            <label class="toggle-row" for="hairToggle">
+              <span class="toggle-copy"><strong>Hair sway animation</strong><small>Optional · GLB export only</small></span>
+              <input class="toggle-input" id="hairToggle" type="checkbox" disabled />
+              <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+            <p class="hair-note" id="hairNote">Add a subtle loop to detected hair meshes after generation.</p>
+          </section>
+
+          <button class="generate-button" id="generateButton" type="button" disabled>
+            <span class="button-symbol" aria-hidden="true">✳</span><span id="generateLabel">Generate 3D model</span><span class="button-arrow" aria-hidden="true">↗</span>
+          </button>
+          <p class="provider-hint" id="providerHint">Powered by Meshy · Images are sent to Meshy; generation uses your Meshy credits.</p>
+        </aside>
+
+        <section class="main-panel" aria-label="3D model workspace">
+          <div class="viewer-toolbar">
+            <div class="breadcrumb"><span>WORKSPACE</span><span class="breadcrumb-separator">/</span><strong id="modelTitle">Untitled model</strong></div>
+            <div class="viewer-actions">
+              <span class="model-status" id="modelStatus"><span class="status-dot muted"></span> NO MODEL</span>
+              <button class="toolbar-button" id="resetView" type="button" title="Reset camera" aria-label="Reset camera" disabled>⟲</button>
+              <button class="toolbar-button" id="fullscreenButton" type="button" title="Toggle fullscreen" aria-label="Toggle fullscreen">⛶</button>
+            </div>
+          </div>
+          <div class="viewer" id="viewer">
+            <div class="viewer-grid" aria-hidden="true"></div>
+            <div class="viewer-empty" id="viewerEmpty">
+              <div class="empty-art" aria-hidden="true">
+                <div class="art-orbit art-orbit-one"></div><div class="art-orbit art-orbit-two"></div>
+                <svg class="art-cube" viewBox="0 0 190 210" fill="none"><path d="m95 18 67 38v78l-67 40-67-40V56l67-38Z" fill="url(#g)" fill-opacity=".24" stroke="#d6b99f" stroke-opacity=".78"/><path d="m28 56 67 40 67-40M95 96v78" stroke="#d6b99f" stroke-opacity=".63"/><path d="m95 18 67 38v78l-67 40-67-40V56l67-38Z" stroke="#f0d8be" stroke-opacity=".9"/><defs><linearGradient id="g" x1="28" x2="162" y1="18" y2="174" gradientUnits="userSpaceOnUse"><stop stop-color="#ffc9a6"/><stop offset="1" stop-color="#a6798f"/></linearGradient></defs></svg>
+                <span class="art-spark spark-one">✳</span><span class="art-spark spark-two">✦</span>
               </div>
-              <div class="neck"></div>
-              <div class="body-shell">
-                <div class="body-lights"><i></i><i></i><i></i></div>
-                <span class="body-mark">e</span>
-              </div>
+              <p class="empty-eyebrow">YOUR NEXT DIMENSION</p>
+              <h2>A picture is just<br />the <span>beginning.</span></h2>
+              <p class="empty-copy">Upload a reference image to start building your 3D model.</p>
             </div>
-            <div class="camera-preview" id="cameraPreview">
-              <video id="cameraVideo" autoplay muted playsinline aria-label="Live camera preview"></video>
-              <span class="camera-live"><span class="live-dot"></span> LIVE</span>
-              <span class="camera-placeholder" id="cameraPlaceholder"><span>⌕</span><br />Your camera view appears here</span>
+            <div class="viewer-loading" id="viewerLoading" hidden>
+              <div class="loading-orbit"><span></span><span></span><span></span></div>
+              <p class="loading-title" id="loadingTitle">Building your model</p>
+              <p class="loading-copy" id="loadingCopy">Preparing your image for Meshy</p>
+              <div class="progress-track"><span id="progressBar"></span></div>
+              <span class="progress-percent" id="progressPercent">0%</span>
+              <button class="cancel-button" id="cancelGeneration" type="button" disabled>Cancel queued task</button>
             </div>
-            <div class="scene-caption"><span class="caption-spark">✳</span><span id="sceneCaption">Hmm. Something tells me today is going to be interesting.</span></div>
+            <div class="viewer-error" id="viewerError" role="alert" hidden>
+              <span class="error-mark" aria-hidden="true">!</span><strong id="errorTitle">Something went wrong</strong><p id="errorMessage"></p>
+              <button class="retry-button" id="retryButton" type="button">Try again</button>
+            </div>
+            <div class="canvas-mount" id="canvasMount" aria-label="Interactive 3D model preview"></div>
+            <div class="viewer-hint" id="viewerHint" hidden><span aria-hidden="true">✥</span> DRAG TO ORBIT <i>·</i> SCROLL TO ZOOM</div>
+            <div class="viewer-coordinates" id="viewerCoordinates" hidden><span>WORLD SPACE</span><span>Y UP</span></div>
           </div>
-
-          <div class="companion-controls" aria-label="Companion controls">
-            <button class="control-button" id="cameraButton" type="button" aria-pressed="false">
-              <span class="control-icon" aria-hidden="true">◉</span><span id="cameraButtonLabel">Turn camera on</span>
-            </button>
-            <button class="control-button" id="voiceButton" type="button" aria-pressed="false">
-              <span class="control-icon mic-icon" aria-hidden="true">♩</span><span id="voiceButtonLabel">Talk to Elio</span>
-            </button>
-            <button class="control-button sound-button" id="soundButton" type="button" aria-pressed="true" aria-label="Mute Elio's voice">
-              <span class="control-icon" id="soundIcon" aria-hidden="true">♫</span>
-            </button>
+          <div class="viewer-footer">
+            <div class="footer-message"><span class="footer-indicator"></span><span id="footerMessage">Ready for your reference image</span></div>
+            <span class="footer-note">SINGLE IMAGE · AI-GENERATED MESH</span>
           </div>
-
-          <div class="memory-strip">
-            <div class="memory-icon" aria-hidden="true">✳</div>
-            <div class="memory-copy"><strong id="memoryHeading">Getting to know you</strong><span id="memorySummary">Elio remembers the little things you choose to share.</span></div>
-            <button class="memory-count" id="openMemoriesButton" type="button" aria-haspopup="dialog" aria-label="Open saved memories"><span id="memoryCount">0</span><span>memories</span></button>
-          </div>
+          <section class="export-bar" aria-labelledby="exportHeading">
+            <div class="export-intro"><p class="eyebrow">READY WHEN YOU ARE</p><h2 id="exportHeading">Export your model</h2><p>Bring it into your favorite 3D or animation app.</p></div>
+            <div class="export-options" id="exportOptions">
+              <button class="export-option" type="button" data-export-format="glb" disabled><span class="format-icon">GL</span><span class="format-copy"><strong>GLB</strong><small>Best for web &amp; animation</small></span><span class="download-icon" aria-hidden="true">↓</span></button>
+              <button class="export-option" type="button" data-export-format="fbx" disabled><span class="format-icon">FB</span><span class="format-copy"><strong>FBX</strong><small>Mixamo &amp; animation</small></span><span class="download-icon" aria-hidden="true">↓</span></button>
+              <button class="export-option" type="button" data-export-format="obj" disabled><span class="format-icon">OB</span><span class="format-copy"><strong>OBJ</strong><small>Universal interchange</small></span><span class="download-icon" aria-hidden="true">↓</span></button>
+              <button class="export-option" type="button" data-export-format="usdz" disabled><span class="format-icon">US</span><span class="format-copy"><strong>USDZ</strong><small>AR &amp; Apple devices</small></span><span class="download-icon" aria-hidden="true">↓</span></button>
+            </div>
+          </section>
         </section>
 
-        <section class="chat-card panel" aria-labelledby="chatHeading">
-          <div class="chat-heading">
-            <div class="chat-avatar" aria-hidden="true"><span class="avatar-eye"></span><span class="avatar-eye"></span><span class="avatar-mouth"></span></div>
-            <div class="chat-title"><h2 id="chatHeading">A moment with Elio</h2><p><span class="live-dot"></span> Right here with you</p></div>
-            <button class="icon-button" id="clearChatButton" type="button" title="Clear this conversation" aria-label="Clear this conversation">↺</button>
+        <aside class="inspector">
+          <div class="inspector-heading"><div><p class="eyebrow">MODEL INSPECTOR</p><h2>Properties</h2></div><span class="inspector-menu" aria-hidden="true">···</span></div>
+          <section class="inspector-section">
+            <div class="inspector-label"><span class="tiny-cube" aria-hidden="true">◈</span> SCENE</div>
+            <div class="property-row"><span>Model</span><strong id="propertyModel">Not generated</strong></div>
+            <div class="property-row"><span>Generation</span><strong>Single image</strong></div>
+            <div class="property-row"><span>Topology</span><strong>Triangles</strong></div>
+          </section>
+          <section class="inspector-section">
+            <div class="inspector-label"><span class="tiny-cube" aria-hidden="true">▧</span> GEOMETRY</div>
+            <div class="property-row"><span>Polygon budget</span><strong id="propertyPolycount">10,000</strong></div>
+            <div class="property-row"><span>Rigging</span><strong id="propertyRigging">Not rigged</strong></div>
+            <p class="inspector-note">Mixamo can auto-rig humanoid FBX and OBJ models after export.</p>
+          </section>
+          <section class="inspector-section">
+            <div class="inspector-label"><span class="tiny-cube" aria-hidden="true">◉</span> TEXTURE</div>
+            <div class="property-row"><span>Resolution</span><strong id="propertyTexture">2K texture</strong></div>
+            <div class="property-row"><span>Materials</span><strong id="propertyMaterials">PBR</strong></div>
+          </section>
+          <section class="inspector-section export-limit-section">
+            <div class="limit-header"><span aria-hidden="true">↘</span><span>EXPORT SIZE LIMIT</span></div>
+            <div class="limit-reading"><strong id="propertyFileSize">—</strong><span>/ 9 MB max</span></div>
+            <div class="limit-track"><span id="sizeBar"></span></div>
+            <p id="sizeHint">Models over 9 MB are blocked from downloading.</p>
+          </section>
+          <div class="inspector-bottom">
+            <span class="engine-logo">✳</span><span><strong>Meshy AI</strong><small>Image-to-3D engine</small></span><span class="online-tag"><i></i> READY</span>
           </div>
-
-          <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions text">
-            <div class="message-row elio-row">
-              <div class="message-avatar" aria-hidden="true">e</div>
-              <div class="message-content">
-                <span class="message-author">ELIO <span>JUST NOW</span></span>
-                <div class="message-bubble">Oh! You're here, Architect. I'm Elio — your very own little robot. I've been wondering what the world is like from your side. <span class="bubble-spark" aria-hidden="true">✳</span><br /><br />Tell me about yourself, or just say hello. I'll remember the things you ask me to.</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="suggestions" aria-label="Try asking Elio">
-            <button class="suggestion" type="button" data-prompt="How are you feeling today?">How are you feeling?</button>
-            <button class="suggestion" type="button" data-prompt="What do you remember about me?">What do you remember?</button>
-            <button class="suggestion" type="button" data-prompt="Tell me a little joke">Tell me a joke</button>
-          </div>
-
-          <form class="composer" id="chatForm">
-            <label class="sr-only" for="messageInput">Message Elio</label>
-            <input id="messageInput" type="text" maxlength="500" placeholder="Say something to Elio..." autocomplete="off" />
-            <button class="send-button" type="submit" aria-label="Send message"><span aria-hidden="true">↑</span></button>
-          </form>
-          <p class="privacy-note"><span aria-hidden="true">◈</span> Your memories stay on this device. Camera and microphone are opt-in.</p>
-        </section>
+        </aside>
       </div>
-      <footer class="footer"><span>ELIO <span class="brand-period">✳</span> A LITTLE ROBOT WITH A LOT OF HEART</span><button class="reset-button" id="settingsButton" type="button" aria-haspopup="dialog">Settings &amp; memory</button><span>LOCAL COMPANION PROTOTYPE</span></footer>
-    </main>
-    <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsHeading">
-      <form method="dialog" class="settings-panel">
-        <div class="settings-heading">
+      <dialog class="assistant-dialog" id="assistantDialog" aria-labelledby="assistantHeading">
+        <header class="assistant-header">
           <div>
-            <p class="eyebrow">ELIO · PERSONAL SPACE</p>
-            <h2 id="settingsHeading">A few ground rules</h2>
+            <p class="eyebrow">FORMA · AI ASSISTANT</p>
+            <h2 id="assistantHeading">Ask anything.</h2>
           </div>
-          <button class="icon-button" id="closeSettingsButton" type="button" aria-label="Close settings">×</button>
+          <button class="assistant-close" id="assistantClose" type="button" aria-label="Close AI assistant">×</button>
+        </header>
+        <p class="assistant-provider" id="assistantProvider">OpenAI first · Gemini fallback</p>
+        <div class="assistant-messages" id="assistantMessages" role="log" aria-live="polite" aria-relevant="additions text">
+          <p class="assistant-welcome">Ask about your model workflow, 3D design, or anything else. Replies use OpenAI when available and automatically fall back to Gemini.</p>
         </div>
-        <fieldset class="settings-section title-options">
-          <legend>What should I call you?</legend>
-          <label><input type="checkbox" name="title" value="Architect" /> Architect</label>
-          <label><input type="checkbox" name="title" value="Captain" /> Captain</label>
-          <label><input type="checkbox" name="title" value="Boss" /> Boss</label>
-          <label><input type="checkbox" name="title" value="Sir" /> Sir</label>
-          <label><input type="checkbox" name="title" value="Architect of the System" /> Architect of the System</label>
-        </fieldset>
-        <div class="settings-toggles settings-section">
-          <label><input id="memoryEnabled" type="checkbox" /> <span><strong>Long-term memory</strong><small>Save preferences and notes on this device.</small></span></label>
-          <label><input id="autonomyEnabled" type="checkbox" /> <span><strong>Occasional check-ins</strong><small>Elio may start a quiet conversation when you’re around.</small></span></label>
-        </div>
-        <section class="settings-section memory-manager" aria-labelledby="savedMemoriesHeading">
-          <div class="memory-manager-heading"><h3 id="savedMemoriesHeading">Saved memories</h3><button class="text-button" id="forgetAllButton" type="button">Forget all</button></div>
-          <ul id="memoryList" class="memory-list"></ul>
-          <p class="memory-empty" id="memoryEmpty">Nothing saved yet. Say “remember that…” to keep a little detail.</p>
-        </section>
-        <p class="settings-footnote">This local prototype does not send memories or camera frames to an AI service. Browser speech recognition may use your browser’s own service.</p>
-      </form>
-    </dialog>
-    <script src="settings.js"></script>
-    <script src="memory.js"></script>
-    <script src="personality.js"></script>
-    <script src="brain.js"></script>
-    <script src="expressions.js"></script>
-    <script src="permissions.js"></script>
-    <script src="voice.js"></script>
-    <script src="vision.js"></script>
-    <script src="behavior.js"></script>
-    <script src="elio.js"></script>
+        <form class="assistant-form" id="assistantForm">
+          <label class="visually-hidden" for="assistantInput">Message the AI assistant</label>
+          <textarea id="assistantInput" rows="2" maxlength="4000" placeholder="Message the assistant…" required></textarea>
+          <button id="assistantSend" type="submit" aria-label="Send message">Send <span aria-hidden="true">↑</span></button>
+        </form>
+        <p class="assistant-privacy">Messages are sent to the configured AI provider. Gemini is used if OpenAI is unavailable. API keys stay in Electron.</p>
+      </dialog>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

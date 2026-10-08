@@ -1,9 +1,18 @@
 window.ElioPermissions = {
-  requestCamera(constraints) {
+  async requestCamera(constraints) {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      return Promise.reject(new Error('Camera access needs a modern browser on HTTPS or localhost.'));
+      throw new Error('Camera access needs a modern browser on HTTPS or localhost.');
     }
-    return navigator.mediaDevices.getUserMedia({ ...constraints, audio: false });
+    if (window.kairo) {
+      const permitted = await window.kairo.invoke('permissions:request', 'camera');
+      if (!permitted) throw new Error('Camera access was not approved.');
+    }
+    try {
+      return await navigator.mediaDevices.getUserMedia({ ...constraints, audio: false });
+    } catch (error) {
+      if (window.kairo) await window.kairo.invoke('permissions:revoke', 'camera');
+      throw error;
+    }
   },
 
   startMicrophoneRecognition(recognition) {
