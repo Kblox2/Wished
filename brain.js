@@ -3,6 +3,8 @@ window.ElioBrain = (() => {
     curious: 'A little curious',
     happy: 'Happy to see you',
     excited: 'So excited!',
+    concerned: 'A little concerned',
+    love: 'Feeling affectionate',
     confused: 'Trying to follow',
     worried: 'Here for you',
     surprised: 'Oh!',
@@ -15,15 +17,24 @@ window.ElioBrain = (() => {
   };
 
   function createProvider({ memory }) {
+    if (!memory || typeof memory.getSettings !== 'function' || typeof memory.getLongTerm !== 'function') {
+      throw new Error('Elio brain could not connect to its memory provider.');
+    }
     const personality = window.ElioPersonality.create();
 
     function currentTitle(turnCount) {
       const titles = memory.getSettings().selectedTitles;
-      return titles[turnCount % titles.length] || 'Architect';
+      if (!Array.isArray(titles) || !titles.length) return 'Architect';
+      const safeTurnCount = Number.isInteger(turnCount) && turnCount >= 0 ? turnCount : 0;
+      return titles[safeTurnCount % titles.length] || 'Architect';
     }
 
     function think({ message, perception = 'conversation' }) {
-      const text = message.trim();
+      if (typeof message !== 'string') {
+        throw new Error('Elio needs a text message to think about.');
+      }
+      const text = message.trim().slice(0, 500);
+      if (!text) return null;
       const lower = text.toLowerCase();
       const stored = memory.getSettings().memoryEnabled ? memory.getLongTerm() : { name: '', likes: [], notes: [] };
       const previousTurn = memory.getContext().filter((turn) => turn.role === 'user').slice(-1)[0];
@@ -153,7 +164,7 @@ window.ElioBrain = (() => {
 
     function observe(event) {
       const mood = personality.observe(event);
-      return { expression: mood, mood: moods[mood] };
+      return { expression: mood, mood: moods[mood] || moods.curious };
     }
 
     return { think, observe, getState: personality.getState };

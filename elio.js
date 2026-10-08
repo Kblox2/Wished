@@ -49,7 +49,9 @@ function setExpression(expression, caption, moodLabel) {
 function currentTitle() {
   const titles = window.ElioMemory.getSettings().selectedTitles;
   const turnCount = window.ElioMemory.getLongTerm().interactions;
-  return titles[turnCount % titles.length] || 'Architect';
+  if (!Array.isArray(titles) || !titles.length) return 'Architect';
+  const safeTurnCount = Number.isInteger(turnCount) && turnCount >= 0 ? turnCount : 0;
+  return titles[safeTurnCount % titles.length] || 'Architect';
 }
 
 function updateMemoryDisplay() {
@@ -200,6 +202,9 @@ function sendMessage(message) {
 
   try {
     const result = brain.think({ message: text });
+    if (!result || typeof result.reply !== 'string' || !result.reply) {
+      throw new Error('Elio could not produce a reply. Please try again.');
+    }
     addMessage('elio', result.reply);
     setExpression(result.expression, result.reply, result.mood);
     updateMemoryDisplay();
