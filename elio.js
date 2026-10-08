@@ -52,7 +52,9 @@ function setExpression(expression, caption, moodLabel, intensity) {
 function currentTitle() {
   const titles = window.ElioMemory.getSettings().selectedTitles;
   const turnCount = window.ElioMemory.getLongTerm().interactions;
-  return titles[turnCount % titles.length] || 'Architect';
+  if (!Array.isArray(titles) || !titles.length) return 'Architect';
+  const safeTurnCount = Number.isInteger(turnCount) && turnCount >= 0 ? turnCount : 0;
+  return titles[safeTurnCount % titles.length] || 'Architect';
 }
 
 function updateMemoryDisplay() {
@@ -328,7 +330,7 @@ document.querySelectorAll('[data-window-action]').forEach((button) => {
     event.preventDefault();
     event.stopPropagation();
     try {
-      await window.kairo.invoke('window-action', button.dataset.windowAction);
+      await window.forma.invoke('window-action', button.dataset.windowAction);
     } catch (error) {
       showCaption(`Window action failed: ${error.message}`);
     }
@@ -368,7 +370,7 @@ elements.autonomyEnabled.addEventListener('change', () => {
 elements.webSearchEnabled.addEventListener('change', async () => {
   if (!elements.webSearchEnabled.checked) {
     try {
-      if (window.kairo) await window.kairo.invoke('permissions:revoke', 'web-search');
+      if (window.forma) await window.forma.invoke('permissions:revoke', 'web-search');
       webSearchPermissionEnabled = false;
       showCaption('Web search is disabled.');
     } catch (error) {
@@ -379,8 +381,8 @@ elements.webSearchEnabled.addEventListener('change', async () => {
   }
 
   try {
-    if (!window.kairo) throw new Error('Web search permissions are available only in the desktop app.');
-    webSearchPermissionEnabled = await window.kairo.invoke('permissions:request', 'web-search');
+    if (!window.forma) throw new Error('Web search permissions are available only in the desktop app.');
+    webSearchPermissionEnabled = await window.forma.invoke('permissions:request', 'web-search');
     elements.webSearchEnabled.checked = webSearchPermissionEnabled;
     showCaption(webSearchPermissionEnabled
       ? 'Web search is allowed for this session. You can revoke it in Settings.'
@@ -415,12 +417,12 @@ elements.settingsDialog.addEventListener('click', (event) => {
 
 async function updateProviderStatus() {
   try {
-    if (!window.kairo) {
+    if (!window.forma) {
       elements.providerStatus.textContent = 'The desktop AI service is unavailable. Launch this app through Electron.';
       elements.providerStatus.hidden = false;
       return;
     }
-    const config = await window.kairo.invoke('system-config');
+    const config = await window.forma.invoke('system-config');
     webSearchPermissionEnabled = Boolean(config.webSearchEnabled);
     if (config.hasApiKey) {
       elements.providerStatus.hidden = true;

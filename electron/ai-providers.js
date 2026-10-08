@@ -7,7 +7,7 @@ async function providerError(response, provider) {
   } catch (error) {
     if (!(error instanceof SyntaxError)) throw error;
   }
-  return new Error(`${provider} request failed (${response.status}): ${detail.slice(0, 500)}`);
+  return new Error(`${provider} request failed (${response.status}): ${String(detail).slice(0, 500)}`);
 }
 
 async function streamSSE(response, provider, onText) {

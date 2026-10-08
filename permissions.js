@@ -3,14 +3,14 @@ window.ElioPermissions = {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       throw new Error('Camera access needs a modern browser on HTTPS or localhost.');
     }
-    if (window.kairo) {
-      const permitted = await window.kairo.invoke('permissions:request', 'camera');
+    if (window.forma) {
+      const permitted = await window.forma.invoke('permissions:request', 'camera');
       if (!permitted) throw new Error('Camera access was not approved.');
     }
     try {
       return await navigator.mediaDevices.getUserMedia({ ...constraints, audio: false });
     } catch (error) {
-      if (window.kairo) await window.kairo.invoke('permissions:revoke', 'camera');
+      if (window.forma) await window.forma.invoke('permissions:revoke', 'camera');
       throw error;
     }
   },

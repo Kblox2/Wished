@@ -25,7 +25,7 @@ window.ElioVision = {
       window.ElioPermissions.stopStream(stream);
       stream = null;
       video.srcObject = null;
-      if (window.kairo) void window.kairo.invoke('permissions:revoke', 'camera');
+      if (window.forma) void window.forma.invoke('permissions:revoke', 'camera');
       onStatus('Camera off. Just us and a little conversation.', false);
     }
 
@@ -107,7 +107,7 @@ window.ElioVision = {
         window.ElioPermissions.stopStream(stream);
         stream = null;
         video.srcObject = null;
-        if (window.kairo) await window.kairo.invoke('permissions:revoke', 'camera');
+        if (window.forma) await window.forma.invoke('permissions:revoke', 'camera');
         onStatus(`I couldn’t start the camera: ${error.message}. Check permission and try again.`, false);
         return false;
       }

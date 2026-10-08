@@ -53,14 +53,14 @@ window.ElioVoice = {
       };
       recognition.onend = () => {
         listening = false;
-        if (window.kairo) void window.kairo.invoke('permissions:revoke', 'microphone');
+        if (window.forma) void window.forma.invoke('permissions:revoke', 'microphone');
         if (finalTranscript.trim()) onTranscript(finalTranscript.trim());
         else onExpression('curious');
       };
 
       try {
-        if (window.kairo) {
-          const permitted = await window.kairo.invoke('permissions:request', 'microphone');
+        if (window.forma) {
+          const permitted = await window.forma.invoke('permissions:request', 'microphone');
           if (!permitted) {
             onCaption('Microphone access was not approved. You can still type to me.');
             return;
@@ -72,7 +72,7 @@ window.ElioVoice = {
         onCaption('I’m all ears. Tap again to interrupt or stop listening.');
       } catch (error) {
         listening = false;
-        if (window.kairo) await window.kairo.invoke('permissions:revoke', 'microphone');
+        if (window.forma) await window.forma.invoke('permissions:revoke', 'microphone');
         onCaption(`The microphone couldn’t start: ${error.message}. Check browser permissions.`);
       }
     }
@@ -114,7 +114,7 @@ window.ElioVoice = {
     function dispose() {
       if (recognition && listening) recognition.abort();
       stopSpeech();
-      if (window.kairo) void window.kairo.invoke('permissions:revoke', 'microphone');
+      if (window.forma) void window.forma.invoke('permissions:revoke', 'microphone');
       listening = false;
     }
 
