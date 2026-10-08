@@ -25,6 +25,7 @@ window.ElioVision = {
       window.ElioPermissions.stopStream(stream);
       stream = null;
       video.srcObject = null;
+      if (window.kairo) void window.kairo.invoke('permissions:revoke', 'camera');
       onStatus('Camera off. Just us and a little conversation.', false);
     }
 
@@ -99,13 +100,14 @@ window.ElioVision = {
         stream.getVideoTracks()[0].addEventListener('ended', () => {
           if (stream) stop();
         }, { once: true });
-        onStatus('Camera on. The preview and lightweight visual checks stay on this device.', true);
+        onStatus('Camera on. Visual checks stay on this device; no camera feed is displayed or uploaded.', true);
         scheduleSample();
         return true;
       } catch (error) {
         window.ElioPermissions.stopStream(stream);
         stream = null;
         video.srcObject = null;
+        if (window.kairo) await window.kairo.invoke('permissions:revoke', 'camera');
         onStatus(`I couldn’t start the camera: ${error.message}. Check permission and try again.`, false);
         return false;
       }

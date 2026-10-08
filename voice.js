@@ -1,5 +1,5 @@
 window.ElioVoice = {
-  createBrowserProvider({ onExpression, onCaption, onTranscript, isEnabled }) {
+  createBrowserProvider({ onExpression, onCaption, onTranscript, onViseme = () => {}, isEnabled }) {
     let recognition = null;
     let listening = false;
     let speaking = false;
@@ -8,6 +8,7 @@ window.ElioVoice = {
     function stopSpeech() {
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       speaking = false;
+      onViseme('rest');
     }
 
     function stopListening() {
@@ -19,7 +20,7 @@ window.ElioVoice = {
       if (recognition && listening) recognition.abort();
     }
 
-    function listen() {
+    async function listen() {
       if (listening) {
         stopListening();
         return;
@@ -52,17 +53,26 @@ window.ElioVoice = {
       };
       recognition.onend = () => {
         listening = false;
+        if (window.kairo) void window.kairo.invoke('permissions:revoke', 'microphone');
         if (finalTranscript.trim()) onTranscript(finalTranscript.trim());
         else onExpression('curious');
       };
 
       try {
+        if (window.kairo) {
+          const permitted = await window.kairo.invoke('permissions:request', 'microphone');
+          if (!permitted) {
+            onCaption('Microphone access was not approved. You can still type to me.');
+            return;
+          }
+        }
         window.ElioPermissions.startMicrophoneRecognition(recognition);
         listening = true;
         onExpression('listening');
         onCaption('I’m all ears. Tap again to interrupt or stop listening.');
       } catch (error) {
         listening = false;
+        if (window.kairo) await window.kairo.invoke('permissions:revoke', 'microphone');
         onCaption(`The microphone couldn’t start: ${error.message}. Check browser permissions.`);
       }
     }
@@ -77,12 +87,23 @@ window.ElioVoice = {
         speaking = true;
         onExpression('speaking');
       };
+      utterance.onboundary = (event) => {
+        if (event.name !== 'word') return;
+        const word = text.slice(event.charIndex).match(/^[\p{L}\p{N}]+/u)?.[0]?.toLowerCase() || '';
+        let viseme = 'open';
+        if (/^[bmp]/.test(word)) viseme = 'closed';
+        else if (/^[uw]/.test(word) || /oo|ou|ow/.test(word)) viseme = 'round';
+        else if (/^[iey]/.test(word) || /ee|ea|ey/.test(word)) viseme = 'wide';
+        onViseme(viseme);
+      };
       utterance.onend = () => {
         speaking = false;
+        onViseme('rest');
         onExpression('curious');
       };
       utterance.onerror = (event) => {
         speaking = false;
+        onViseme('rest');
         if (event.error !== 'canceled' && event.error !== 'interrupted') {
           onCaption(`Voice playback couldn’t start: ${event.error}. You can still read my reply.`);
         }
@@ -93,6 +114,7 @@ window.ElioVoice = {
     function dispose() {
       if (recognition && listening) recognition.abort();
       stopSpeech();
+      if (window.kairo) void window.kairo.invoke('permissions:revoke', 'microphone');
       listening = false;
     }
 

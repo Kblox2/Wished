@@ -1,24 +1,30 @@
-# Elio — your little companion
+# Forma — Image to 3D
 
-Elio is a responsive, browser-based companion prototype. Its animated face is the focus; conversation, opt-in camera sensing, voice controls, and memory settings sit around it. The app runs without a server backend, package install, or external AI account.
+Forma is an Electron desktop app for turning a single PNG, JPG, or WEBP reference image into an interactive 3D model using Meshy.
 
 ## Run locally
 
-Open `index.html` in a modern browser, or serve this folder from `localhost` (for example, `python -m http.server 8000`) and visit `http://localhost:8000`. Camera access requires HTTPS or `localhost`. The page uses plain browser scripts and has no build step.
+1. Add `MESHY_API_KEY=your-meshy-api-key` to the project `.env` file.
+2. Run `npm install`.
+3. Run `npm run dev` to start Vite and Electron.
+4. Run `npm run build` to type-check and create the production renderer bundle.
+5. Run `npm start` to open the production bundle.
 
-## Current foundation
+The Meshy key is read by Electron's main process and never exposed to the renderer. Uploaded images are sent to Meshy for model generation.
 
-- **Character and expressions:** an original Elio personality, playful local reply logic, mood, internal energy, curiosity, evolving preferences, quiet-minded goals, and animated curious, happy, excited, surprised, confused, worried, annoyed, sleepy, thinking, listening, speaking, and neutral faces.
-- **Modules:** `settings.js` owns user preferences; `memory.js` keeps short- and long-term memory; `personality.js` holds developing preferences and state; `brain.js` decides replies through a replaceable provider; `expressions.js` maps states to the face; `permissions.js` gates browser media requests; `voice.js` and `vision.js` adapt browser I/O; `behavior.js` schedules restrained check-ins; and `elio.js` wires these into the UI.
-- **AI provider seam:** `ElioBrain.createProvider({ memory })` exposes `think()` and `observe()` for replacing the current local rules with a hosted or on-device model later. The current provider is deliberately a lightweight rules-based prototype, not a generative AI.
-- **Memory:** short-term conversation context stays in page memory; long-term name, likes, notes, and conversation count use this browser's local storage. Settings let you inspect or remove individual memories, clear all memory, or turn long-term memory off.
-- **Voice provider seam:** `ElioVoice.createBrowserProvider(...)` wraps browser speech recognition and synthesis. Starting to talk cancels Elio's current speech; microphone access is only requested after tapping the talk button. Voice quality and recognition support depend on the browser and installed voices, and can be replaced through this interface.
-- **Vision provider seam:** `ElioVision.createBrowserProvider(...)` requests a camera stream only after the camera button is tapped. It samples a small preview about every 1.5 seconds, using the experimental local face detector when available or coarse local motion sensing otherwise. The stream has no audio track and is stopped when the camera is turned off or the page is left.
-- **Behavior:** optional check-ins happen only while the page is visible and focused, after a quiet minute and a half, at most three times per page session. Elio settles down after extended inactivity. Turn check-ins off in Settings to keep Elio quiet.
-- **Actions and permissions:** the current companion has no arbitrary device-control tools. Camera activation and microphone recognition are explicit user actions; speech output and local memory are the only other actions available to the prototype.
+## Create and export
 
-## Privacy and limitations
+- Upload an image up to 10 MB, select a character or object, and choose the polygon and texture budgets.
+- Meshy Smart Topology creates a clean triangle mesh with a 5k–15k face budget and 2K textures. Character requests use an A-pose to improve humanoid auto-rigging compatibility.
+- Inspect the generated GLB in the orbitable 3D viewer.
+- Export available Meshy formats: GLB, FBX, OBJ, and USDZ. FBX and OBJ can be uploaded to Mixamo for its auto-rigging workflow; the generated model itself is not rigged.
+- Optional hair sway is added to GLB exports only, and is available when the generated model has a separately identifiable hair mesh. It is a simple looping mesh animation, not a hair-physics simulation.
+- Every saved model is capped at 9,000,000 bytes. Oversized source exports are rejected before saving; lower the polygon or texture setting and regenerate. The size inspector reports the downloaded GLB preview size.
 
-This prototype does not connect to a cloud AI or upload camera frames or saved memories. Camera access is opt-in and can be stopped at any time. Browser speech recognition may use the browser vendor's own service and is subject to its privacy policy. Speech output is the browser's installed voice, not a custom voice model.
+Image-to-3D is a reconstruction from one view, so hidden sides and fine details may differ from the reference. A single image cannot guarantee an exact likeness or Mixamo auto-rigging. Meshy usage may consume credits according to your Meshy plan.
 
-The browser must remain open for Elio to react or initiate a check-in. This is not yet a native mobile app, a background service, or a persistent autonomous agent. Replies are local patterns and do not have the knowledge or reasoning of a language model. Camera face detection availability varies by browser; the fallback detects motion, not identity or scene meaning.
+## Implementation
+
+- Three.js provides the interactive GLB preview, orbit controls, and optional GLB animation export.
+- Meshy generation and file downloads run in Electron's main process, behind a restricted preload IPC bridge.
+- Renderer context isolation, sandboxing, disabled Node integration, blocked popups/navigation, and a restrictive content-security policy are enabled.

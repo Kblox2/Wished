@@ -5,9 +5,7 @@ const elements = {
   welcomeTitle: document.getElementById('welcomeTitle'),
   cameraButton: document.getElementById('cameraButton'),
   cameraButtonLabel: document.getElementById('cameraButtonLabel'),
-  cameraPreview: document.getElementById('cameraPreview'),
   cameraVideo: document.getElementById('cameraVideo'),
-  cameraPlaceholder: document.getElementById('cameraPlaceholder'),
   voiceButton: document.getElementById('voiceButton'),
   voiceButtonLabel: document.getElementById('voiceButtonLabel'),
   soundButton: document.getElementById('soundButton'),
@@ -16,6 +14,7 @@ const elements = {
   memorySummary: document.getElementById('memorySummary'),
   memoryCount: document.getElementById('memoryCount'),
   messages: document.getElementById('messages'),
+  providerStatus: document.getElementById('providerStatus'),
   chatForm: document.getElementById('chatForm'),
   messageInput: document.getElementById('messageInput'),
   clearChatButton: document.getElementById('clearChatButton'),
@@ -24,14 +23,16 @@ const elements = {
   closeSettingsButton: document.getElementById('closeSettingsButton'),
   memoryEnabled: document.getElementById('memoryEnabled'),
   autonomyEnabled: document.getElementById('autonomyEnabled'),
+  webSearchEnabled: document.getElementById('webSearchEnabled'),
   memoryList: document.getElementById('memoryList'),
   memoryEmpty: document.getElementById('memoryEmpty'),
   forgetAllButton: document.getElementById('forgetAllButton'),
   openMemoriesButton: document.getElementById('openMemoriesButton'),
 };
 
-const initialMessages = elements.messages.innerHTML;
 let memoryError = '';
+let baseExpression = 'curious';
+let webSearchPermissionEnabled = false;
 const expressions = window.ElioExpressions.create({
   scene: elements.robotScene,
   moodLabel: elements.moodLabel,
@@ -41,8 +42,10 @@ function showCaption(message) {
   elements.sceneCaption.textContent = message;
 }
 
-function setExpression(expression, caption, moodLabel) {
+function setExpression(expression, caption, moodLabel, intensity) {
+  if (expression !== 'speaking' && expression !== 'listening') baseExpression = expression;
   expressions.set(expression, moodLabel);
+  if (Number.isFinite(intensity)) elements.robotScene.dataset.intensity = String(Math.max(0, Math.min(1, intensity)));
   if (caption) showCaption(caption);
 }
 
@@ -71,7 +74,7 @@ function updateMemoryDisplay() {
     elements.memoryHeading.textContent = 'Getting to know you';
     elements.memorySummary.textContent = saved.interactions
       ? `We’ve shared ${saved.interactions} little ${saved.interactions === 1 ? 'moment' : 'moments'} so far.`
-      : 'Elio remembers the little things you choose to share.';
+      : 'Kairo remembers the things you choose to share.';
   } else {
     const details = [];
     if (saved.name) details.push(`your name is ${saved.name}`);
@@ -122,7 +125,7 @@ function addMessage(speaker, text) {
   content.className = 'message-content';
   const author = document.createElement('span');
   author.className = 'message-author';
-  author.textContent = speaker === 'elio' ? 'ELIO' : 'YOU';
+  author.textContent = speaker === 'elio' ? 'KAIRO' : 'YOU';
   const time = document.createElement('span');
   time.textContent = 'JUST NOW';
   author.append(time);
@@ -134,21 +137,29 @@ function addMessage(speaker, text) {
   row.append(content);
   elements.messages.append(row);
   elements.messages.scrollTop = elements.messages.scrollHeight;
+  return { row, bubble };
 }
 
 const brain = window.ElioBrain.createProvider({ memory: window.ElioMemory });
 
 const voice = window.ElioVoice.createBrowserProvider({
   onExpression: (expression) => {
-    setExpression(expression);
+    if (expression === 'speaking') {
+      elements.robotScene.dataset.speaking = 'true';
+      elements.moodLabel.textContent = 'SPEAKING';
+    } else {
+      elements.robotScene.dataset.speaking = 'false';
+      setExpression(expression === 'curious' ? baseExpression : expression);
+    }
     const listening = expression === 'listening';
     elements.voiceButton.setAttribute('aria-pressed', String(listening));
     elements.voiceButtonLabel.textContent = listening
       ? 'Listening · tap to stop'
-      : voice.speaking ? 'Interrupt & talk' : 'Talk to Elio';
+      : voice.speaking ? 'Interrupt & talk' : 'Talk to Kairo';
   },
   onCaption: showCaption,
   onTranscript: (transcript) => sendMessage(transcript),
+  onViseme: (viseme) => elements.robotScene.dispatchEvent(new CustomEvent('kairo:viseme', { detail: viseme })),
   isEnabled: () => window.ElioMemory.getSettings().speechEnabled,
 });
 
@@ -157,57 +168,62 @@ const vision = window.ElioVision.createBrowserProvider({
   onStatus: (caption, active) => {
     elements.cameraButton.setAttribute('aria-pressed', String(active));
     elements.cameraButtonLabel.textContent = active ? 'Turn camera off' : 'Turn camera on';
-    elements.cameraPreview.classList.toggle('active', active);
-    elements.cameraPlaceholder.setAttribute('aria-hidden', String(active));
     showCaption(caption);
   },
   onEvent: (event) => {
     const observation = brain.observe(event);
-    const title = currentTitle();
-    const reply = event === 'face'
-      ? `There you are, ${title}. The System spotted a face.`
-      : `The System noticed some movement, ${title}. Should I be curious?`;
-    addMessage('elio', reply);
-    setExpression(observation.expression, reply, observation.mood);
-    voice.speak(reply);
+    const caption = event === 'face'
+      ? 'Local vision detected a face; no image was sent.'
+      : 'Local vision noticed movement; no image was sent.';
+    setExpression(observation.expression, caption, observation.mood);
     behavior.recordActivity();
   },
 });
 
 const behavior = window.ElioBehavior.create({
   onCheckIn: () => {
-    const title = currentTitle();
-    const prompt = [
-      `Architect? I had a thought. Do you think clouds know they’re being dramatic?`,
-      `Captain, I noticed how quiet it got. I can stay quiet too, if you like.`,
-      `Boss, the System has a question: what’s one small thing that made today yours?`,
-    ][Math.floor(Math.random() * 3)];
-    addMessage('elio', prompt.replace(/\b(?:Architect|Captain|Boss)\b/, title));
-    setExpression('curious', prompt.replace(/\b(?:Architect|Captain|Boss)\b/, title));
-    voice.speak(prompt.replace(/\b(?:Architect|Captain|Boss)\b/, title));
+    setExpression('curious', 'Quiet moment. I’ll let you choose what comes next.');
   },
   onSleep: () => setExpression('sleepy', 'I’m getting a little quiet. I’ll be here when you need me.'),
   onWake: () => setExpression('curious', 'Oh, you’re back. I was only resting my eyes.'),
 });
 
-function sendMessage(message) {
+async function sendMessage(message) {
   const text = message.trim();
   if (!text) return;
   behavior.recordActivity();
   if (voice.listening) voice.abortListening();
+  voice.stopSpeech();
+  await brain.cancel();
   addMessage('you', text);
-  setExpression('thinking', 'Let me turn that over for a second.');
+  const responseMessage = addMessage('elio', '…');
+  setExpression('thinking', 'I’m considering the question.');
 
   try {
-    const result = brain.think({ message: text });
-    addMessage('elio', result.reply);
-    setExpression(result.expression, result.reply, result.mood);
+    const result = await brain.think({
+      message: text,
+      onChunk: (partial) => {
+        responseMessage.bubble.textContent = partial;
+        elements.messages.scrollTop = elements.messages.scrollHeight;
+      },
+    });
+    if (result.cancelled) {
+      responseMessage.row.remove();
+      return;
+    }
+    responseMessage.bubble.textContent = result.reply;
+    elements.providerStatus.hidden = true;
+    setExpression(result.expression, result.reply, result.mood, result.intensity);
     updateMemoryDisplay();
     voice.speak(result.reply);
   } catch (error) {
-    showCaption(error.message);
-    addMessage('elio', 'I hit a snag saving that moment. Your message is still here in this chat.');
-    setExpression('confused', 'I hit a snag. Your message is still here in this chat.');
+    const detail = error instanceof Error ? error.message : String(error);
+    responseMessage.bubble.textContent = `AI request failed: ${detail}`;
+    showCaption(detail);
+    elements.providerStatus.textContent = detail;
+    elements.providerStatus.hidden = false;
+    elements.providerStatus.dataset.state = 'error';
+    setExpression('worried', 'The AI request did not complete.');
   }
 }
 
@@ -237,6 +253,7 @@ function openSettings() {
   const settings = window.ElioMemory.getSettings();
   elements.memoryEnabled.checked = settings.memoryEnabled;
   elements.autonomyEnabled.checked = settings.autonomyEnabled;
+  elements.webSearchEnabled.checked = webSearchPermissionEnabled;
   document.querySelectorAll('input[name="title"]').forEach((input) => {
     input.checked = settings.selectedTitles.includes(input.value);
   });
@@ -281,7 +298,7 @@ function toggleSpeech() {
   const enabled = !window.ElioMemory.getSettings().speechEnabled;
   if (!saveSettings({ speechEnabled: enabled })) return;
   elements.soundButton.setAttribute('aria-pressed', String(enabled));
-  elements.soundButton.setAttribute('aria-label', enabled ? "Mute Elio's voice" : "Unmute Elio's voice");
+  elements.soundButton.setAttribute('aria-label', enabled ? "Mute Kairo's voice" : "Unmute Kairo's voice");
   elements.soundIcon.textContent = enabled ? '♫' : '♪';
   if (!enabled) voice.stopSpeech();
   showCaption(enabled ? 'Voice replies are on.' : 'Voice replies are muted. I’ll keep chatting here.');
@@ -289,10 +306,10 @@ function toggleSpeech() {
 
 function clearConversation() {
   window.ElioMemory.clearConversation();
-  elements.messages.innerHTML = initialMessages;
-  addMessage('elio', `Still right here, ${currentTitle()}. What shall we talk about?`);
-  setExpression('happy', `A fresh little chat. I’m all ears, ${currentTitle()}.`);
-  voice.speak(`Still right here, ${currentTitle()}. What shall we talk about?`);
+  elements.messages.replaceChildren();
+  setExpression('curious', 'A clear thread. Ask me anything.');
+  brain.cancel();
+  voice.stopSpeech();
 }
 
 function forgetMemory(kind, index) {
@@ -306,12 +323,24 @@ function forgetMemory(kind, index) {
 }
 
 elements.chatForm.addEventListener('submit', submitMessage);
+document.querySelectorAll('[data-window-action]').forEach((button) => {
+  button.addEventListener('click', async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      await window.kairo.invoke('window-action', button.dataset.windowAction);
+    } catch (error) {
+      showCaption(`Window action failed: ${error.message}`);
+    }
+  });
+});
 elements.cameraButton.addEventListener('click', toggleCamera);
 elements.voiceButton.addEventListener('click', () => {
   behavior.recordActivity();
+  brain.cancel();
   voice.listen();
   elements.voiceButton.setAttribute('aria-pressed', String(voice.listening));
-  elements.voiceButtonLabel.textContent = voice.listening ? 'Listening · tap to stop' : 'Talk to Elio';
+  elements.voiceButtonLabel.textContent = voice.listening ? 'Listening · tap to stop' : 'Talk to Kairo';
 });
 elements.soundButton.addEventListener('click', toggleSpeech);
 elements.clearChatButton.addEventListener('click', clearConversation);
@@ -336,6 +365,32 @@ elements.autonomyEnabled.addEventListener('change', () => {
     elements.autonomyEnabled.checked = window.ElioMemory.getSettings().autonomyEnabled;
   }
 });
+elements.webSearchEnabled.addEventListener('change', async () => {
+  if (!elements.webSearchEnabled.checked) {
+    try {
+      if (window.kairo) await window.kairo.invoke('permissions:revoke', 'web-search');
+      webSearchPermissionEnabled = false;
+      showCaption('Web search is disabled.');
+    } catch (error) {
+      elements.webSearchEnabled.checked = true;
+      showCaption(`Web search could not be disabled: ${error.message}`);
+    }
+    return;
+  }
+
+  try {
+    if (!window.kairo) throw new Error('Web search permissions are available only in the desktop app.');
+    webSearchPermissionEnabled = await window.kairo.invoke('permissions:request', 'web-search');
+    elements.webSearchEnabled.checked = webSearchPermissionEnabled;
+    showCaption(webSearchPermissionEnabled
+      ? 'Web search is allowed for this session. You can revoke it in Settings.'
+      : 'Web search permission was not granted.');
+  } catch (error) {
+    webSearchPermissionEnabled = false;
+    elements.webSearchEnabled.checked = false;
+    showCaption(`Web search permission failed: ${error.message}`);
+  }
+});
 document.querySelectorAll('input[name="title"]').forEach((input) => input.addEventListener('change', updateTitleSettings));
 elements.memoryList.addEventListener('click', (event) => {
   const button = event.target.closest('button[data-kind]');
@@ -358,10 +413,40 @@ elements.settingsDialog.addEventListener('click', (event) => {
   if (event.target === elements.settingsDialog) closeSettings();
 });
 
+async function updateProviderStatus() {
+  try {
+    if (!window.kairo) {
+      elements.providerStatus.textContent = 'The desktop AI service is unavailable. Launch this app through Electron.';
+      elements.providerStatus.hidden = false;
+      return;
+    }
+    const config = await window.kairo.invoke('system-config');
+    webSearchPermissionEnabled = Boolean(config.webSearchEnabled);
+    if (config.hasApiKey) {
+      elements.providerStatus.hidden = true;
+      elements.providerStatus.dataset.state = 'ready';
+      return;
+    }
+    elements.providerStatus.textContent = 'OpenAI is not configured. Copy .env.example to .env, add OPENAI_API_KEY, then restart the app. No scripted AI fallback is used.';
+    elements.providerStatus.hidden = false;
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    elements.providerStatus.textContent = `AI configuration could not be checked: ${detail}`;
+    elements.providerStatus.hidden = false;
+  }
+}
+
 window.addEventListener('pagehide', () => {
   behavior.stop();
   vision.stop();
   voice.dispose();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'hidden') return;
+  vision.stop();
+  if (voice.listening) voice.abortListening();
+  voice.stopSpeech();
 });
 
 try {
@@ -372,7 +457,8 @@ try {
 updateMemoryDisplay();
 const savedSettings = window.ElioMemory.getSettings();
 elements.soundButton.setAttribute('aria-pressed', String(savedSettings.speechEnabled));
-elements.soundButton.setAttribute('aria-label', savedSettings.speechEnabled ? "Mute Elio's voice" : "Unmute Elio's voice");
+elements.soundButton.setAttribute('aria-label', savedSettings.speechEnabled ? "Mute Kairo's voice" : "Unmute Kairo's voice");
 elements.soundIcon.textContent = savedSettings.speechEnabled ? '♫' : '♪';
 behavior.setEnabled(savedSettings.autonomyEnabled);
 behavior.start();
+updateProviderStatus();

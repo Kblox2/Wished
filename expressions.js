@@ -1,25 +1,31 @@
 window.ElioExpressions = {
   create({ scene, moodLabel }) {
     const labels = {
-      curious: 'CURIOUS',
       happy: 'HAPPY',
-      excited: 'EXCITED',
       sad: 'SAD',
-      concerned: 'CONCERNED',
-      worried: 'WORRIED',
+      angry: 'ANGRY',
+      confused: 'CONFUSED',
+      curious: 'CURIOUS',
       surprised: 'SURPRISED',
-      love: 'AFFECTIONATE',
       sleepy: 'SLEEPY',
+      tired: 'TIRED',
+      bored: 'BORED',
+      excited: 'EXCITED',
       thinking: 'THINKING',
+      focused: 'FOCUSED',
+      worried: 'WORRIED',
+      nervous: 'NERVOUS',
+      proud: 'PROUD',
+      playful: 'PLAYFUL',
+      laughing: 'LAUGHING',
       listening: 'LISTENING',
       speaking: 'SPEAKING',
-      confused: 'CONFUSED',
-      annoyed: 'ANNOYED',
+      singing: 'SINGING',
       neutral: 'NEUTRAL',
     };
 
     function set(expression, label) {
-      const selected = Object.hasOwn(labels, expression) ? expression : 'curious';
+      const selected = Object.hasOwn(labels, expression) ? expression : 'neutral';
       scene.dataset.expression = selected;
       moodLabel.textContent = label || labels[selected];
     }
